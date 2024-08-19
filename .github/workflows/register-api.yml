@@ -1,5 +1,6 @@
 name: Register API Definition to Azure API Center
 on:
+  workflow_dispatch:
   pull_request:
     types: [closed]
     branches:
@@ -10,9 +11,7 @@ permissions:
   contents: read
   pull-requests: read
 env:
-  # set this to your Azure API Center resource group name
   RESOURCE_GROUP: api-center-demo
-  # set this to your Azure API Center service name
   SERVICE_NAME: api-center-demo-44645
 jobs:
   register:
@@ -38,11 +37,11 @@ jobs:
             if (files.data.length === 1) {
               const filename = files.data[0].filename;
               core.exportVariable('API_FILE_LOCATION', filename);
-              console.log(`API_FILE_LOCATION: ${{ env.API_FILE_LOCATION }}`);
+              core.setOutput('apiFileLocation', filename);
+            } else {
+              core.setFailed('The PR does not add exactly one specification file.');
             }
-            else {
-              console.log('The PR does not add exactly one specification file.');
-            }
+
       - name: Azure login
         uses: azure/login@v1
         with:
@@ -53,4 +52,4 @@ jobs:
         with:
           azcliversion: latest
           inlineScript: |
-            az apic api register -g ${{ env.RESOURCE_GROUP }} -n ${{ env.SERVICE_NAME }} --api-location ${{ env.API_FILE_LOCATION }}
+            az apic api register -g ${{ env.RESOURCE_GROUP }} -n ${{ env.SERVICE_NAME }} --api-location ${{ steps.get-file-location.outputs.apiFileLocation }}
