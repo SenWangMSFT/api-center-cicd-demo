@@ -27,8 +27,8 @@ jobs:
           node-version: '14'
       - name: Install Spectral
         run: npm install -g @stoplight/spectral
-      - name: Validate OpenAPI Specification
-        run: spectral lint APIs/**/*.json
+      - name: Validate OpenAPI files with Spectral
+        run: spectral lint APIs/**/*.json --ruleset .spectral.yaml
 
   register:
     needs: validate-openapi
