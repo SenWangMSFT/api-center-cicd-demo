@@ -16,7 +16,22 @@ env:
   # set this to your Azure API Center service name
   SERVICE_NAME: api-center-demo-44645
 jobs:
+  validate-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install Spectral
+        run: npm install -g @stoplight/spectral
+      - name: Validate OpenAPI Specification
+        run: spectral lint APIs/**/*.json
+
   register:
+    needs: validate-openapi
     runs-on: ubuntu-latest
     environment: production
     steps:
